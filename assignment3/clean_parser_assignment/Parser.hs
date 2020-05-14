@@ -1,6 +1,6 @@
 module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,
               lit, number, iter, accept, require, token,
-              spaces, word, (-#), (#-)) where
+              spaces, word, (-#), (#-), comment) where
 import Prelude hiding (return, fail)
 import Data.Char
 import CoreParser
@@ -32,7 +32,7 @@ token m = m #- spaces
 letter :: Parser Char
 letter =  char ? isAlpha
 
--- what is token???
+-- returns the first word with space removed after it
 word :: Parser String
 word = token (letter # iter letter >-> cons)
 
@@ -46,7 +46,7 @@ accept :: String -> Parser String
 accept w = (token (chars (length w))) ? (==w)
 
 require :: String -> Parser String
-require w  = accept w ! (err $ "Missing string: " ++ w)
+require w  = accept w ! (err $ "Program error: expecting " ++ w)
 
 lit :: Char -> Parser Char
 lit c = token char ? (==c)
@@ -63,3 +63,6 @@ number' n = digitVal #> (\ d -> number' (10*n+d))
 number :: Parser Integer
 number = token (digitVal #> number')
 
+--apply char until '\n' comes up
+comment :: Parser String
+comment = iter $ char ? (/='\n')
