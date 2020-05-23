@@ -24,10 +24,10 @@ m -# n = m # n >-> snd
 m #- n = m # n >-> fst
 
 spaces :: Parser String
-spaces = iter $ char ? isSpace
+spaces = iter $ comment ! (char ? isSpace)
 
 token :: Parser a -> Parser a
-token m = m #- spaces
+token m = m #- spaces 
 
 letter :: Parser Char
 letter =  char ? isAlpha
@@ -37,9 +37,17 @@ word :: Parser String
 word = token (letter # iter letter >-> cons)
 
 --applies char on a string n times and transforms it to string with cons
+-- doesn't handel when n is larger than the length
+{-
 chars :: Int -> Parser String
 chars 0 = return []
 chars n = char # chars (n-1) >-> cons
+-}
+
+chars :: Int -> Parser String
+chars n cs
+    | n > (length cs) = Nothing
+    | otherwise = return (take n cs) (drop n cs)
 
 -- parses the upcoming chars if the they are the same as input-string
 accept :: String -> Parser String
@@ -64,5 +72,5 @@ number :: Parser Integer
 number = token (digitVal #> number')
 
 --apply char until '\n' comes up
-comment :: Parser String
-comment = iter $ char ? (/='\n')
+comment :: Parser Char
+comment = (accept "--") -# iter (char ? (/= '\n')) #- (char ? (=='\n')) >-> const ' '

@@ -21,6 +21,7 @@ n31 = testValue "2+z"     {-  Expr.value: undefined variable z -}
 
 p1 = testValue "y^3"
 p2 = testValue "y^3^4"
+p21 = testValue "y^(3^4)"
 p3 = testValue "8^4"
 p4 = testValue "(y+3)*2^(x+y)"
 

@@ -82,3 +82,13 @@ s4 = "\
 p4 = fromString s4
 
 rp4 = Program.exec p4 [4,4]
+
+s5 = "\
+\read a;\
+\read -- input a value\n\
+\     -- into variable b:\n\
+\     b;\
+\s := 3;"
+
+p5 = fromString s5
+rp5 = Program.exec p5 [5,6]

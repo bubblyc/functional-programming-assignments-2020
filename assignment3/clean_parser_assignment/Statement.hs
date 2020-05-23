@@ -11,8 +11,7 @@ data Statement =
     Write Expr.T |
     Skip |
     Begin [Statement]|
-    While Expr.T Statement |
-    Comment String
+    While Expr.T Statement 
     deriving Show
 
 stmtAssign = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
@@ -36,7 +35,6 @@ bBegin s = Begin s
 stmtWhile = accept "while" -# Expr.parse # require "do" -# parse >-> bWhile
 bWhile (e, s) = While e s
 
-stmtComment = accept "--" -# comment #- require "\n" >-> \s -> Comment s
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 -- if the stmt list is empty, return empty list
@@ -66,7 +64,7 @@ exec (Begin xs: stmts) dict input = exec (xs ++ stmts) dict input
 indent = flip take (repeat ' ')
 
 prnt :: Int -> Statement -> String
-prnt n (Comment str) = indent n ++ "-- " ++ str ++ "\n"
+--prnt n (Comment str) = indent n ++ "-- " ++ str ++ "\n"
 prnt n Skip = indent n ++ "skip;\n"
 prnt n (Assignment str expr) = indent n ++ str ++ " := " ++ Expr.toString expr ++";\n"
 prnt n (If cond thenStmt elseStmt) = indent n ++ "if " ++ Expr.toString cond ++ " then\n" ++ 
@@ -80,5 +78,5 @@ prnt n (Read str)         = indent n ++ "read " ++ str ++ ";\n"
 prnt n (Write expr)        = indent n ++ "write " ++ Expr.toString expr ++ ";\n"            
 
 instance Parse Statement where
-  parse = stmtAssign ! stmtIf ! stmtRead ! stmtWrite ! stmtBegin ! stmtWhile ! stmtSkip ! stmtComment
+  parse = stmtAssign ! stmtIf ! stmtRead ! stmtWrite ! stmtBegin ! stmtWhile ! stmtSkip 
   toString = prnt 0
